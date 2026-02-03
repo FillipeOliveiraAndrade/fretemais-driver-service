@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: fretemais-postgres
+    environment:
+      POSTGRES_DB: fretemais
+      POSTGRES_USER: fretemais
+      POSTGRES_PASSWORD: fretemais
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fretemais"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fretemais-driver-service
+    ports:
+      - "8080:8080"
+    environment:
+        DB_URL: jdbc:postgresql://postgres:5432/fretemais
+        DB_USERNAME: fretemais
+        DB_PASSWORD: fretemais
+        JPA_SHOW_SQL: false
+        JWT_SECRET: super-secret-key
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

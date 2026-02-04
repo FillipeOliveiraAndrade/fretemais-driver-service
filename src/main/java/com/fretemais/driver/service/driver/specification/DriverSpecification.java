@@ -13,7 +13,7 @@ public class DriverSpecification {
     }
 
     public static Specification<Driver> isActive() {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("active"));
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("isActive"));
     }
 
     public static Specification<Driver> hasName(String name) {

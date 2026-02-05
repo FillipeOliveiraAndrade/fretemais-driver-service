@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +27,7 @@ import com.fretemais.driver.service.driver.domain.VehicleType;
 import com.fretemais.driver.service.driver.dto.DriverCreateRequest;
 import com.fretemais.driver.service.driver.dto.DriverFilter;
 import com.fretemais.driver.service.driver.dto.DriverResponse;
+import com.fretemais.driver.service.driver.dto.DriverSortBy;
 import com.fretemais.driver.service.driver.dto.DriverUpdateRequest;
 import com.fretemais.driver.service.driver.service.DriverService;
 
@@ -72,9 +75,18 @@ public class DriverController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) Set<VehicleType> vehicleTypes,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "CREATED_AT") DriverSortBy sortBy,
+            @RequestParam(defaultValue = "DESC") Sort.Direction sortDir) {
 
         String resolvedText = text != null ? text : name;
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortDir, sortBy.getProperty())
+        );
 
         DriverFilter filter = new DriverFilter(
                 resolvedText,

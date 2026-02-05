@@ -19,5 +19,5 @@ spring:
 
 security:
   jwt:
-    secret: dev-secret-key-dev-secret-key-dev-secret-key
+    secret: ${JWT_SECRET:dev-secret-key-dev-secret-key-dev-secret-key}
     expiration: 3600000

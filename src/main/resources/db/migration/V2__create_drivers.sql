@@ -20,3 +20,11 @@ CREATE INDEX idx_drivers_state ON drivers (state);
 
 -- Índice GIN para array de tipos de veículo
 CREATE INDEX idx_drivers_vehicle_types ON drivers USING GIN (vehicle_types);
+
+CREATE OR REPLACE FUNCTION array_overlap(text[], text[])
+RETURNS boolean
+LANGUAGE SQL
+IMMUTABLE
+AS $$
+    SELECT $1 && $2;
+$$;

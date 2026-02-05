@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.fretemais.driver.service.auth.dto.LoginRequest;
 import com.fretemais.driver.service.auth.dto.LoginResponse;
 import com.fretemais.driver.service.auth.domain.User;
+import com.fretemais.driver.service.auth.exception.UnauthorizedException;
 import com.fretemais.driver.service.auth.repository.UserRepository;
 import com.fretemais.driver.service.auth.security.JwtTokenProvider;
 
@@ -22,10 +23,10 @@ public class AuthService {
     public LoginResponse login(LoginRequest loginRequest) {
 
         User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+                .orElseThrow(() -> new UnauthorizedException("Credenciais inválidas"));
 
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new RuntimeException("Credenciais inválidas");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         boolean passwordMatches = passwordEncoder.matches(
@@ -34,7 +35,7 @@ public class AuthService {
         );
 
         if (!passwordMatches) {
-            throw new RuntimeException("Credenciais inválidas");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         String token = jwtTokenProvider.generateToken(user);

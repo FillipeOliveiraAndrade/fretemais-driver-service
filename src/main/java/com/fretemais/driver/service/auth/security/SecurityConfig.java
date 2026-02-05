@@ -7,13 +7,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fretemais.driver.service.common.api.RestAccessDeniedHandler;
+import com.fretemais.driver.service.common.api.RestAuthenticationEntryPoint;
+
 @Configuration
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
 
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider, ObjectMapper objectMapper) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -30,6 +36,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/login").permitAll()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint(objectMapper))
+                .accessDeniedHandler(new RestAccessDeniedHandler(objectMapper))
             )
             .addFilterBefore(
                 jwtAuthenticationFilter,

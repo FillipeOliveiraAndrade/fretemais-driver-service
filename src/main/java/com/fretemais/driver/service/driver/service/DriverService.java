@@ -56,7 +56,7 @@ public class DriverService {
 
         Specification<Driver> spec = Specification
                 .where(DriverSpecification.isActive())
-                .and(DriverSpecification.hasName(filter.name()))
+                .and(DriverSpecification.hasText(filter.text()))
                 .and(DriverSpecification.hasCity(filter.city()))
                 .and(DriverSpecification.hasState(filter.state()))
                 .and(DriverSpecification.hasVehicleTypes(filter.vehicleTypes()));

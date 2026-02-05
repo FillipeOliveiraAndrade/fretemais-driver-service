@@ -67,14 +67,17 @@ public class DriverController {
 
     @GetMapping
     public Page<DriverResponse> search(
-            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String text,
+            @RequestParam(name = "name", required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) Set<VehicleType> vehicleTypes,
             Pageable pageable) {
 
+        String resolvedText = text != null ? text : name;
+
         DriverFilter filter = new DriverFilter(
-                name,
+                resolvedText,
                 city,
                 state,
                 vehicleTypes);

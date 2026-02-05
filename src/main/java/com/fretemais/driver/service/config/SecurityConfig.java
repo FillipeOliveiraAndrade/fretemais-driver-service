@@ -1,4 +1,4 @@
-package com.fretemais.driver.service.auth.security;
+package com.fretemais.driver.service.config;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fretemais.driver.service.auth.security.JwtAuthenticationFilter;
+import com.fretemais.driver.service.auth.security.JwtTokenProvider;
 import com.fretemais.driver.service.common.api.RestAccessDeniedHandler;
 import com.fretemais.driver.service.common.api.RestAuthenticationEntryPoint;
 

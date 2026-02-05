@@ -1,4 +1,4 @@
-package com.fretemais.driver.service.auth.security;
+package com.fretemais.driver.service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

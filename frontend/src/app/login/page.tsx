@@ -158,7 +158,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-4 text-xs text-[var(--muted)]">
-            Credenciais de teste: admin@fretemais.com / 123456
+            Credenciais de teste: admin@fretemais.com / fretemais@2026
           </div>
         </div>
       </div>

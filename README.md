@@ -96,26 +96,59 @@ Antes de começar, certifique-se de ter instalado:
 
 ---
 
-## 🚀 Instalacao e Execucao
+## 🚀 Instalação e Execução
 
-### ✅ Modo recomendado (um único comando)
+### Passo 1: Clone o repositório
+```bash
+git clone https://github.com/seu-usuario/fretemais-driver-service.git
+cd fretemais-driver-service
+```
 
-Este projeto foi organizado para o avaliador rodar tudo com **um único comando**:
-
+### Passo 2: Suba o ambiente completo
 ```bash
 docker compose up -d --build
 ```
 
-Isso sobe automaticamente:
+Isso iniciará automaticamente:
+- 🐘 **PostgreSQL** (porta 5432)
+- ☕ **Backend** (porta 8080)
+- ⚛️ **Frontend** (porta 3000)
+
+### Passo 3: Aguarde a inicialização
+O backend pode levar ~30 segundos para iniciar. Acompanhe os logs:
+```bash
+docker compose logs -f backend
+```
+
+Quando ver `Started Application`, está pronto! ✅
+
+### Passo 4: Acesse o sistema
+- 🌐 **Frontend:** http://localhost:3000
+- 📚 **API Docs (Swagger):** http://localhost:8080/swagger-ui.html
+
+---
+
+### ⚠️ Observações Importantes
+
+✅ **Não é necessário instalar:**
+- Java
+- Node.js
 - PostgreSQL
-- Backend
-- Frontend
+- Maven
+- npm
 
-✅ **Nao e necessario rodar `npm install`, `npm run dev` ou `./mvnw`.**
+Tudo roda dentro do Docker!
 
-Para parar:
+---
+
+### 🛑 Para parar o ambiente
 ```bash
 docker compose down
+```
+
+Para remover volumes (limpar banco de dados):
+```bash
+docker compose down -v
 ```
 
 ---

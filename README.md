@@ -225,11 +225,3 @@ O uso de IA está documentado em:
 ```
 AI_PROMPTS.md
 ```
-
----
-
-## 👨‍💻 Autor
-Preencha com seus dados:
-- GitHub:
-- LinkedIn:
-- Email:

@@ -22,7 +22,7 @@ public class UserSeedConfig {
             if (userRepository.findByEmail(email).isEmpty()) {
                 User admin = new User();
                 admin.setEmail(email);
-                admin.setPassword(passwordEncoder.encode("fretemais@2025"));
+                admin.setPassword(passwordEncoder.encode("fretemais@2026"));
                 admin.setActive(true);
 
                 userRepository.save(admin);

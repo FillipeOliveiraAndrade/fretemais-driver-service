@@ -219,12 +219,18 @@ export default function DriversPage() {
 
             {error ? <Alert variant="error">{error}</Alert> : null}
 
-            <DriversTable
-              drivers={drivers}
-              isLoading={isLoading}
-              sortValue={sortValue}
-              onSortChange={handleSortChange}
-            />
+            <div
+              className={`transition-[opacity,transform] duration-300 ease-out ${
+                isLoading ? "translate-y-1 opacity-60" : "translate-y-0 opacity-100"
+              }`}
+            >
+              <DriversTable
+                drivers={drivers}
+                isLoading={isLoading}
+                sortValue={sortValue}
+                onSortChange={handleSortChange}
+              />
+            </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--muted)]">
               <span>

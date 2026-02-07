@@ -104,7 +104,6 @@ Antes de começar, certifique-se de ter instalado:
 Este projeto foi organizado para o avaliador rodar tudo com **um único comando**:
 
 ```bash
-cd /home/fillipe/fillipe/fretemais/fretemais-driver-service
 docker compose up -d --build
 ```
 

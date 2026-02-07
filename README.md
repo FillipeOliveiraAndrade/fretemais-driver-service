@@ -17,7 +17,6 @@ Sistema completo para cadastro, busca e gestão de motoristas parceiros, desenvo
 - [Testes](#testes)
 - [Melhorias Futuras](#melhorias-futuras)
 - [Uso de IA](#uso-de-ia)
-- [Autor](#autor)
 
 ---
 
@@ -169,11 +168,6 @@ http://localhost:8080/swagger-ui.html
 ### Exemplo de busca
 ```
 GET /drivers?text=maria&state=SP&vehicleTypes=VAN&vehicleTypes=TRUCK&page=0&size=10&sortBy=NAME&sortDir=ASC
-```
-
-Campos válidos para `sortBy`:
-```
-NAME, EMAIL, CREATED_AT, UPDATED_AT, CITY, STATE
 ```
 
 ---

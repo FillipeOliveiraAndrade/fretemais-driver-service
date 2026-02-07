@@ -8,11 +8,14 @@ import { ApiRequestError } from "@/lib/api";
 import {
   buildDriverSearchParams,
   EMPTY_FILTERS,
+  DEFAULT_PAGE_SIZE,
   fetchDrivers,
+  PAGE_SIZE_OPTIONS,
   parseDriverSearchParams,
   type Driver,
   type DriverFilters,
   type DriverSortValue,
+  type PageSizeOption,
 } from "@/lib/drivers";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import Alert from "@/components/Alert";
@@ -38,6 +41,7 @@ export default function DriversPage() {
   );
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<PageSizeOption>(DEFAULT_PAGE_SIZE);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [sortValue, setSortValue] = useState<DriverSortValue>("CREATED_AT_DESC");
@@ -50,13 +54,24 @@ export default function DriversPage() {
     setFilters(parsed.filters);
     setAppliedFilters(parsed.filters);
     setPage(parsed.page);
+    setPageSize(parsed.pageSize);
     setSortValue(parsed.sortValue);
     setSuccessKey(parsed.success);
   }, [searchParams]);
 
   const updateQueryParams = useCallback(
-    (nextFilters: DriverFilters, nextPage: number, nextSort: DriverSortValue) => {
-      const params = buildDriverSearchParams(nextFilters, nextPage, nextSort);
+    (
+      nextFilters: DriverFilters,
+      nextPage: number,
+      nextSort: DriverSortValue,
+      nextPageSize: PageSizeOption
+    ) => {
+      const params = buildDriverSearchParams(
+        nextFilters,
+        nextPage,
+        nextSort,
+        nextPageSize
+      );
       const query = params.toString();
       router.push(query ? `/drivers?${query}` : "/drivers");
     },
@@ -68,7 +83,7 @@ export default function DriversPage() {
     setError(null);
 
     try {
-      const data = await fetchDrivers(appliedFilters, page, sortValue);
+      const data = await fetchDrivers(appliedFilters, page, sortValue, pageSize);
       setDrivers(data.content ?? []);
       setTotalElements(data.totalElements ?? 0);
       setTotalPages(data.totalPages ?? 0);
@@ -86,7 +101,7 @@ export default function DriversPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [appliedFilters, page, sortValue, router]);
+  }, [appliedFilters, page, sortValue, pageSize, router]);
 
   useEffect(() => {
     loadDrivers();
@@ -101,12 +116,12 @@ export default function DriversPage() {
 
   const handleApplyFilters = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    updateQueryParams(filters, 0, sortValue);
+    updateQueryParams(filters, 0, sortValue, pageSize);
   };
 
   const handleClearFilters = () => {
     setFilters(EMPTY_FILTERS);
-    updateQueryParams(EMPTY_FILTERS, 0, sortValue);
+    updateQueryParams(EMPTY_FILTERS, 0, sortValue, pageSize);
   };
 
   const toggleVehicleType = (type: string) => {
@@ -123,16 +138,21 @@ export default function DriversPage() {
       return;
     }
 
-    updateQueryParams(appliedFilters, nextPage, sortValue);
+    updateQueryParams(appliedFilters, nextPage, sortValue, pageSize);
   };
 
   const handleSortChange = (value: DriverSortValue) => {
     setSortValue(value);
-    updateQueryParams(appliedFilters, 0, value);
+    updateQueryParams(appliedFilters, 0, value, pageSize);
   };
 
   const handleDismissSuccess = () => {
-    updateQueryParams(appliedFilters, page, sortValue);
+    updateQueryParams(appliedFilters, page, sortValue, pageSize);
+  };
+
+  const handlePageSizeChange = (value: PageSizeOption) => {
+    setPageSize(value);
+    updateQueryParams(appliedFilters, 0, sortValue, value);
   };
 
   const totalLabel =
@@ -210,7 +230,23 @@ export default function DriversPage() {
               <span>
                 Mostrando {drivers.length} de {totalElements}
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
+                  Itens por pagina
+                  <select
+                    className="rounded-lg border border-[var(--border)] bg-transparent px-2 py-1 text-xs text-[var(--ink)]"
+                    value={pageSize}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value) as PageSizeOption)
+                    }
+                  >
+                    {PAGE_SIZE_OPTIONS.map((sizeOption) => (
+                      <option key={sizeOption} value={sizeOption}>
+                        {sizeOption}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   type="button"
                   className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs"

@@ -236,7 +236,7 @@ public class DriverController {
                     description = "Tamanho da pagina",
                     example = "10"
             )
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Campo de ordenacao permitido",

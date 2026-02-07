@@ -50,7 +50,9 @@ export const SORT_OPTIONS = [
 export type DriverSortValue = (typeof SORT_OPTIONS)[number]["value"];
 
 export const DEFAULT_SORT: DriverSortValue = "CREATED_AT_DESC";
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE_OPTIONS = [5, 10] as const;
+export type PageSizeOption = (typeof PAGE_SIZE_OPTIONS)[number];
+export const DEFAULT_PAGE_SIZE: PageSizeOption = 5;
 
 export const EMPTY_FILTERS: DriverFilters = {
   text: "",
@@ -78,6 +80,14 @@ export function parseDriverSearchParams(params: SearchParamsLike) {
   const rawPage = Number.parseInt(params.get("page") ?? "0", 10);
   const page = Number.isNaN(rawPage) || rawPage < 0 ? 0 : rawPage;
 
+  const rawSize = Number.parseInt(
+    params.get("size") ?? String(DEFAULT_PAGE_SIZE),
+    10
+  );
+  const pageSize = PAGE_SIZE_OPTIONS.includes(rawSize as PageSizeOption)
+    ? (rawSize as PageSizeOption)
+    : DEFAULT_PAGE_SIZE;
+
   return {
     filters: {
       text: params.get("text") ?? "",
@@ -86,6 +96,7 @@ export function parseDriverSearchParams(params: SearchParamsLike) {
       vehicleTypes,
     },
     page,
+    pageSize,
     sortValue,
     success: params.get("success") ?? "",
   };
@@ -94,7 +105,8 @@ export function parseDriverSearchParams(params: SearchParamsLike) {
 export function buildDriverSearchParams(
   filters: DriverFilters,
   page: number,
-  sortValue: DriverSortValue
+  sortValue: DriverSortValue,
+  pageSize: PageSizeOption
 ) {
   const params = new URLSearchParams();
 
@@ -111,6 +123,10 @@ export function buildDriverSearchParams(
 
   if (page > 0) {
     params.set("page", String(page));
+  }
+
+  if (pageSize !== DEFAULT_PAGE_SIZE) {
+    params.set("size", String(pageSize));
   }
 
   if (sortValue !== DEFAULT_SORT) {
@@ -136,7 +152,8 @@ const resolveSortParams = (value: DriverSortValue) => {
 export async function fetchDrivers(
   filters: DriverFilters,
   page: number,
-  sortValue: DriverSortValue
+  sortValue: DriverSortValue,
+  pageSize: PageSizeOption
 ) {
   const { sortBy, sortDir } = resolveSortParams(sortValue);
   const params = new URLSearchParams();
@@ -153,7 +170,7 @@ export async function fetchDrivers(
   filters.vehicleTypes.forEach((type) => params.append("vehicleTypes", type));
 
   params.set("page", String(page));
-  params.set("size", String(PAGE_SIZE));
+  params.set("size", String(pageSize));
   params.set("sortBy", sortBy);
   params.set("sortDir", sortDir);
 

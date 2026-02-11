@@ -1,19 +1,35 @@
 # 🚚 FreteMais - Sistema de Gestão de Motoristas
 
-Sistema completo para cadastro, busca e gestão de motoristas parceiros, desenvolvido para organizar a base de motoristas da FreteMais e facilitar a busca por profissionais compatíveis com demandas de frete.
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+
+Sistema web para cadastro, busca e gestão de motoristas parceiros. Foco em filtros combináveis, autenticação e experiência simples para uso interno.
+
+**Acesso rápido (avaliador):**
+```bash
+docker compose up -d --build
+```
+Depois acesse o frontend em `http://localhost:3000`.
+
+**Credenciais de acesso**
+- Email: `admin@fretemais.com`
+- Senha: `fretemais@2026`
 
 ---
 
 ## 📋 Índice
 - [Sobre o Projeto](#sobre-o-projeto)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Decisões Técnicas](#decisões-técnicas)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Pré-requisitos](#pré-requisitos)
-- [Instalação e Execução](#instalacao-e-execucao)
+- [Instalação e Execução](#instalação-e-execução)
 - [Como Usar o Sistema](#como-usar-o-sistema)
+- [API - Documentação](#api---documentação)
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [API - Documentação](#api---documentacao)
-- [Decisões Técnicas](#decisoes-tecnicas)
 - [Testes](#testes)
 - [Melhorias Futuras](#melhorias-futuras)
 - [Uso de IA](#uso-de-ia)
@@ -22,18 +38,81 @@ Sistema completo para cadastro, busca e gestão de motoristas parceiros, desenvo
 
 ## 🎯 Sobre o Projeto
 
-Este sistema foi desenvolvido para resolver um problema real da FreteMais: a dificuldade em gerenciar e localizar rapidamente motoristas parceiros quando há uma demanda de frete.
+A FreteMais precisa organizar sua base de motoristas e permitir buscas rápidas por região, cidade/UF e tipos de veículo. Este projeto entrega uma solução web completa com:
+- autenticação
+- CRUD de motoristas
+- busca avançada com filtros combináveis
+- paginação e ordenação
 
-**Problema identificado:**
-- Informações dos motoristas espalhadas em planilhas e WhatsApp
-- Perda de tempo na busca por motoristas adequados
-- Dificuldade em reutilizar contatos de bons profissionais
+---
 
-**Solução implementada:**
-- Sistema web centralizado e seguro
-- Busca avançada com filtros combináveis
-- Interface intuitiva para equipe operacional
-- Controle de acesso com autenticação
+## ⚙️ Funcionalidades
+
+### ✅ Implementadas
+- **Autenticação**
+  - Login com email e senha
+  - Rotas protegidas via JWT
+
+- **Gestão de Motoristas (CRUD)**
+  - ➕ Cadastrar motorista
+  - ✏️ Editar motorista
+  - 📋 Listar motoristas
+  - 👁️ Visualizar detalhes
+  - 🗑️ Excluir motorista (soft delete)
+
+- **Busca Avançada (principal ponto do desafio)**
+  - 🔍 Busca por texto (nome, email, telefone)
+  - 🗺️ Filtro por UF
+  - 🏙️ Filtro por cidade
+  - 🚛 Filtro por tipos de veículo (múltipla seleção)
+  - 📄 Paginação
+  - 🔄 Ordenação por campo e direção
+  - 🎯 Combinação simultânea de filtros
+
+---
+
+## 🏗️ Arquitetura
+
+Monorepo com backend e frontend separados:
+
+```
+[ Frontend (Next.js) ]  --->  [ API Spring Boot ]  --->  [ PostgreSQL ]
+```
+
+Visão simplificada:
+```
+┌───────────────────────┐        ┌───────────────────────┐        ┌──────────────────────┐
+│     Frontend          │        │       Backend         │        │      PostgreSQL      │
+│  Next.js + React      │  --->  │  Spring Boot + JPA     │  --->  │  Dados dos motoristas│
+└───────────────────────┘        └───────────────────────┘        └──────────────────────┘
+```
+
+### Backend (camadas principais)
+- **Controller**: expõe endpoints REST
+- **Service**: regras de negócio
+- **Repository**: acesso aos dados (JPA)
+- **DTOs**: requests/responses
+- **Specifications**: filtros dinâmicos
+
+---
+
+## 💡 Decisões Técnicas
+
+### 1) PostgreSQL + array de enums
+- Requisito do desafio: `vehicleTypes` persistido como `TEXT[]`.
+- Filtro por tipos usa função `array_overlap(text[], text[])`.
+
+### 2) JWT para autenticação
+- API stateless e simples de consumir pelo frontend.
+
+### 3) Specifications para filtros combináveis
+- Permite compor filtros dinâmicos sem explodir o número de queries.
+
+### 4) Soft delete
+- Remoção não apaga o registro: marca como inativo.
+
+### 5) Monorepo + Docker Compose
+- Facilita avaliação com um único comando.
 
 ---
 
@@ -45,7 +124,7 @@ Este sistema foi desenvolvido para resolver um problema real da FreteMais: a dif
 - **Spring Security + JWT**
 - **Spring Data JPA + Specifications**
 - **PostgreSQL 16**
-- **Flyway (migrations)**
+- **Flyway**
 - **Swagger/OpenAPI (Springdoc)**
 - **Maven**
 
@@ -61,38 +140,12 @@ Este sistema foi desenvolvido para resolver um problema real da FreteMais: a dif
 
 ---
 
-## ⚙️ Funcionalidades
-
-### ✅ Implementadas
-- **Autenticação**
-  - Login com email e senha
-  - Rotas protegidas via JWT
-
-- **Gestão de Motoristas (CRUD Completo)**
-  - ➕ Cadastrar motorista
-  - ✏️ Editar motorista
-  - 📋 Listar motoristas
-  - 👁️ Visualizar detalhes
-  - 🗑️ Excluir motorista (soft delete)
-
-- **Busca Avançada**
-  - 🔍 Busca por texto (nome, email, telefone)
-  - 🗺️ Filtro por Estado (UF)
-  - 🏙️ Filtro por Cidade
-  - 🚛 Filtro por tipos de veículo (múltipla seleção)
-  - 📄 Paginação
-  - 🔄 Ordenação por campo e direção
-  - 🎯 Combinação simultânea de filtros
-
----
-
 ## 📦 Pré-requisitos
 
-Antes de começar, certifique-se de ter instalado:
 - **Docker** (20.x ou superior)
 - **Docker Compose** (2.x ou superior)
 
-> ⚠️ Se você usar Docker, **não precisa** instalar Java, Node.js ou PostgreSQL localmente.
+> Usando Docker, não é necessário instalar Java, Node.js ou PostgreSQL localmente.
 
 ---
 
@@ -109,44 +162,29 @@ cd fretemais-driver-service
 docker compose up -d --build
 ```
 
-Isso iniciará automaticamente:
+Isso iniciará:
 - 🐘 **PostgreSQL** (porta 5432)
 - ☕ **Backend** (porta 8080)
 - ⚛️ **Frontend** (porta 3000)
 
 ### Passo 3: Aguarde a inicialização
-O backend pode levar ~30 segundos para iniciar. Acompanhe os logs:
+O backend pode levar ~30 segundos para iniciar.
 ```bash
 docker compose logs -f backend
 ```
 
-Quando ver `Started Application`, está pronto! ✅
+Quando aparecer `Started ...Application`, está pronto.
 
 ### Passo 4: Acesse o sistema
-- 🌐 **Frontend:** http://localhost:3000
-- 📚 **API Docs (Swagger):** http://localhost:8080/swagger-ui.html
+- **Frontend:** `http://localhost:3000`
+- **Swagger (API Docs):** `http://localhost:8080/swagger-ui.html`
 
----
-
-### ⚠️ Observações Importantes
-
-✅ **Não é necessário instalar:**
-- Java
-- Node.js
-- PostgreSQL
-- Maven
-- npm
-
-Tudo roda dentro do Docker!
-
----
-
-### 🛑 Para parar o ambiente
+### Parar o ambiente
 ```bash
 docker compose down
 ```
 
-Para remover volumes (limpar banco de dados):
+Para apagar o banco e reiniciar do zero:
 ```bash
 docker compose down -v
 ```
@@ -155,27 +193,96 @@ docker compose down -v
 
 ## 📖 Como Usar o Sistema
 
-### 1) Acesse o sistema
-- Frontend: `http://localhost:3000`
+### 1) Acesse o frontend
+`http://localhost:3000`
 
-### 2) Login (usuario seed)
-- **Email:** `admin@fretemais.com`
-- **Senha:** `fretemais@2026`
+### 2) Faça login
+- Email: `admin@fretemais.com`
+- Senha: `fretemais@2026`
 
-### 3) Navegação
-Após login, você pode:
-- Criar motoristas
-- Editar e visualizar detalhes
-- Excluir (soft delete)
-- Filtrar e ordenar listagens
+### 3) Use o sistema
+Você pode:
+- Criar, editar e excluir motoristas
+- Filtrar por texto, cidade, UF e tipos de veículo
+- Ordenar por nome, email, cidade, UF ou data
 
-### 4) Tipos de veículo disponíveis
-- VAN
-- TOCO
-- BAU
-- SIDER
-- TRUCK
-- BITRUCK
+### 4) Seed automática
+Ao subir o sistema, **20 motoristas** são criados automaticamente (apenas se o banco estiver vazio).
+
+---
+
+## 🔌 API - Documentação
+
+Swagger disponível em:
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### Endpoints principais
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/auth/login` | Login e geração do token JWT |
+| `GET` | `/drivers` | Lista com filtros, paginação e ordenação |
+| `GET` | `/drivers/{id}` | Detalha motorista |
+| `POST` | `/drivers` | Cria motorista |
+| `PUT` | `/drivers/{id}` | Atualiza motorista |
+| `DELETE` | `/drivers/{id}` | Remove (soft delete) |
+
+### Parâmetros de busca
+- `text` (nome/email/telefone)
+- `city`
+- `state`
+- `vehicleTypes` (pode repetir)
+- `page` (0-based)
+- `size`
+- `sortBy` (`NAME`, `EMAIL`, `CITY`, `STATE`, `CREATED_AT`, `UPDATED_AT`)
+- `sortDir` (`ASC` ou `DESC`)
+
+Exemplo:
+```
+GET /drivers?text=maria&state=SP&vehicleTypes=VAN&vehicleTypes=TRUCK&page=0&size=10&sortBy=NAME&sortDir=ASC
+```
+
+> Todas as rotas de `/drivers` exigem header:
+```
+Authorization: Bearer <token>
+```
+
+### Exemplo de login
+```
+POST /auth/login
+```
+Request:
+```json
+{
+  "email": "admin@fretemais.com",
+  "password": "fretemais@2026"
+}
+```
+Response:
+```json
+{
+  "token": "jwt_token",
+  "expiresAt": "2026-02-05T10:00:00"
+}
+```
+
+### Exemplo de criação de motorista
+```
+POST /drivers
+```
+Request:
+```json
+{
+  "name": "João Silva",
+  "email": "joao.silva@fretemais.com",
+  "phone": "11990001111",
+  "city": "São Paulo",
+  "state": "SP",
+  "vehicleTypes": ["VAN", "TRUCK"]
+}
+```
 
 ---
 
@@ -189,39 +296,33 @@ fretemais-driver-service/
 └── README.md
 ```
 
----
-
-## 🔌 API - Documentação
-
-Swagger disponível em:
+### Backend
 ```
-http://localhost:8080/swagger-ui.html
+backend/
+├── src/main/java/com/fretemais/driver/service/
+│   ├── auth/                # login, JWT, segurança
+│   ├── common/              # erros padronizados, utils
+│   ├── config/              # configurações (security/openapi)
+│   └── driver/              # domínio de motoristas
+│       ├── controller/
+│       ├── domain/
+│       ├── dto/
+│       ├── repository/
+│       ├── seed/
+│       ├── service/
+│       └── specification/
+└── src/main/resources/
+    └── db/migration/        # Flyway (migrations)
 ```
 
-### Exemplo de busca
+### Frontend
 ```
-GET /drivers?text=maria&state=SP&vehicleTypes=VAN&vehicleTypes=TRUCK&page=0&size=10&sortBy=NAME&sortDir=ASC
+frontend/
+├── src/app/                  # rotas (App Router)
+├── src/components/           # componentes reutilizáveis
+├── src/lib/                  # client API e helpers
+└── src/hooks/                # hooks (auth, etc)
 ```
-
----
-
-## 💡 Decisões Técnicas
-
-### 1) **PostgreSQL + array**
-Tipos de veículo são persistidos em `TEXT[]` no Postgres, conforme requisito.  
-O filtro por tipo usa a função `array_overlap(text[], text[])`.
-
-### 2) **JWT para autenticação**
-Autenticação stateless com expiração configurável.
-
-### 3) **Soft delete**
-Exclusões marcam o motorista como inativo, preservando histórico.
-
-### 4) **Specifications**
-Filtros dinâmicos e combináveis com JPA Specifications.
-
-### 5) **Monorepo + Docker Compose**
-Facilita a avaliação com um único comando.
 
 ---
 
